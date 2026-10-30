@@ -1,0 +1,115 @@
+extends CharacterBody3D
+
+
+@onready var head = $CameraHolder
+@onready var cam = $CameraHolder/Camera3D
+@onready var raycast = $CameraHolder/Camera3D/RayCast3D
+
+
+var accel = 6
+var SPEED = 5.0
+var JUMP_VELOCITY = 4.5
+var crouched = false 
+var input_dir = Vector3(0,0,0) 
+var direction = Vector3() 
+var sens = 0.005
+var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
+var hold_object: RigidBody3D = null
+var throw_force = 10.0
+var hold_position: Node3D
+
+func _ready():
+	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	hold_position = Node3D.new()
+	hold_position.name = "HoldPosition"
+	cam.add_child(hold_position)
+	hold_position.position = Vector3(0, 0, -2)
+	raycast.enabled = true
+	raycast.collide_with_areas = true
+	raycast.collide_with_bodies = true
+	raycast.target_position = Vector3(0, 0, -3)
+
+func _input(event):
+	if Input.is_action_just_pressed("ui_cancel"):
+		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+			Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		else:
+			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+			
+	if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+		if event is InputEventMouseMotion:
+			head.rotate_y(-event.relative.x * sens)
+			cam.rotate_x(-event.relative.y * sens)
+			cam.rotation.x = clamp(cam.rotation.x, deg_to_rad(-89), deg_to_rad(89))
+	
+	if event is InputEventMouseButton and event.pressed:
+		match event.button_index:
+			MOUSE_BUTTON_LEFT: 
+				if hold_object:
+					release_object() 
+				else:
+					pick_up_object() 
+			
+			MOUSE_BUTTON_RIGHT:
+				if hold_object:
+					throw_object(true)
+
+func pick_up_object():
+	if raycast.is_colliding():
+		var collider = raycast.get_collider()
+		if collider is RigidBody3D:
+			hold_object = collider
+			hold_object.set_meta("original_collision_mask", hold_object.collision_mask)
+			hold_object.set_meta("original_collision_layer", hold_object.collision_layer)
+			hold_object.set_meta("original_gravity", hold_object.gravity_scale)
+			
+			hold_object.freeze = true
+			hold_object.collision_mask = 0
+			hold_object.collision_layer = 0
+			hold_object.gravity_scale = 0
+			
+
+func release_object():
+	if hold_object:
+		hold_object.freeze = false
+		hold_object.collision_mask = hold_object.get_meta("original_collision_mask", 1)
+		hold_object.collision_layer = hold_object.get_meta("original_collision_layer", 1)
+		hold_object.gravity_scale = hold_object.get_meta("original_gravity", 1.0)
+		hold_object = null
+
+func throw_object(strong_throw: bool = false):
+	if hold_object:
+		hold_object.freeze = false
+		hold_object.collision_mask = hold_object.get_meta("original_collision_mask", 1)
+		hold_object.collision_layer = hold_object.get_meta("original_collision_layer", 1)
+		hold_object.gravity_scale = hold_object.get_meta("original_gravity", 1.0)
+		var throw_power = throw_force * 2.0 if strong_throw else throw_force
+		hold_object.linear_velocity = cam.global_transform.basis.z * -throw_power
+		hold_object = null
+
+func _physics_process(delta):
+	if not is_on_floor():
+		velocity.y -= gravity * delta
+	else:
+		if Input.is_action_just_pressed("ui_accept"):
+			velocity.y = JUMP_VELOCITY
+	input_dir = Input.get_vector("+a", "+d", "+w", "+s")
+	direction = (head.transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
+ 
+	velocity.x = lerp(velocity.x, direction.x * SPEED, accel * delta)
+	velocity.z = lerp(velocity.z, direction.z * SPEED, accel * delta)
+	
+	move_and_slide()
+
+	if hold_object:
+		hold_object.global_transform.origin = hold_position.global_transform.origin
+
+func can_interact() -> bool:
+	return raycast.is_colliding() and raycast.get_collider() is RigidBody3D
+
+func get_looking_at_object() -> RigidBody3D:
+	if raycast.is_colliding():
+		var collider = raycast.get_collider()
+		if collider is RigidBody3D:
+			return collider
+	return null

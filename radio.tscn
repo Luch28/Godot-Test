@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://dr8axb21ulffa"]
+
+[ext_resource type="PackedScene" uid="uid://bry280iwaubtf" path="res://import/radio.glb" id="1_flxc7"]
+[ext_resource type="AudioStream" uid="uid://nm0gpr26jtj2" path="res://Elusin_Sematary_-_9_Scarecrows_76306584.wav" id="2_543sh"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_543sh"]
+size = Vector3(1.4187012, 0.4081421, 0.24047852)
+
+[node name="Node3D" type="RigidBody3D"]
+
+[node name="radio" parent="." instance=ExtResource("1_flxc7")]
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="radio"]
+stream = ExtResource("2_543sh")
+unit_size = 8.2
+autoplay = true
+max_distance = 40.0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0008544922, 0.28012085, -0.014526367)
+shape = SubResource("BoxShape3D_543sh")

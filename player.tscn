@@ -1,0 +1,60 @@
+[gd_scene load_steps=6 format=3 uid="uid://b8v8uvtjoexpc"]
+
+[ext_resource type="Script" uid="uid://bi6fyy3a3fuhg" path="res://test.gd" id="1_4flbx"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xicv1"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_4flbx"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_4flbx"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_onrkg"]
+
+[node name="Node3D" type="Node3D"]
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="."]
+script = ExtResource("1_4flbx")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.265507, 0)
+shape = SubResource("CapsuleShape3D_xicv1")
+
+[node name="AudioListener3D" type="AudioListener3D" parent="CharacterBody3D/CollisionShape3D"]
+doppler_tracking = 1
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CharacterBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.286927, 0)
+mesh = SubResource("CapsuleMesh_4flbx")
+skeleton = NodePath("../..")
+
+[node name="CameraHolder" type="Node3D" parent="CharacterBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.30865717, 0)
+
+[node name="Camera3D" type="Camera3D" parent="CharacterBody3D/CameraHolder"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.9101017, 0)
+
+[node name="RayCast3D" type="RayCast3D" parent="CharacterBody3D/CameraHolder/Camera3D"]
+target_position = Vector3(0, 0, -3)
+collision_mask = 2
+
+[node name="HoldPosision" type="Node3D" parent="CharacterBody3D/CameraHolder/Camera3D"]
+
+[node name="RigidBody3D2" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7310828, 2.4900975, -7.535201)
+collision_layer = 2
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D2"]
+mesh = SubResource("BoxMesh_4flbx")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D2"]
+shape = SubResource("BoxShape3D_onrkg")
+
+[node name="RigidBody3D3" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.41118395, 2.4900975, -6.1560354)
+collision_layer = 2
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D3"]
+mesh = SubResource("BoxMesh_4flbx")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D3"]
+shape = SubResource("BoxShape3D_onrkg")
