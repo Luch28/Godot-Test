@@ -1,12 +1,8 @@
-# Godot Fake Radio
+# Godot Test
 
-It is a simple fake radio implementation for Godot 4.3.
+Language check. I'm planning to rewrite it into a simple liminal-space walking sim
 
-## How to use it?
+<img width="100" alt="1234" src="https://github.com/user-attachments/assets/de41e0c2-4a74-410d-a7fa-76d19fabec65" />
 
-* Download and install plugin
-* Add node `Radio` to your scene
-* Add nodes `Station` to node `Radio`
-* Set up nodes `Station` and add music to this nodes
 
-You can check [examples](https://github.com/Roker2/godot_fake_radio/tree/master/examples)
+
